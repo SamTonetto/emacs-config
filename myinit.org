@@ -22,11 +22,9 @@
                                (lambda (fg) (set-face-foreground 'mode-line fg))
                                orig-fg))))
 #+END_SRC
-** Mouse and Keyboard Scroll one-line at a time
+** Refining mouse/keyboard scrolling
 #+BEGIN_SRC emacs-lisp
 (setq mouse-wheel-scroll-amount '(10))
-;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil)))
-;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
 (setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't)       ; scroll window under mouse
 (setq scroll-step 3)                     ; keyboard scroll 3 lines at a time
