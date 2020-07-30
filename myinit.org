@@ -721,7 +721,6 @@ Credit goes to Artur Malabarba and Michael Fogleman.
 ;;        (eshell-send-input)))
 #+END_SRC
 
-
 ** coding-init.el
 #+BEGIN_SRC emacs-lisp
 ;; (require-package 'paredit)
