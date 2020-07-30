@@ -1,16 +1,70 @@
-#+STARTUP overview
 
-# Thanks to Mike Zamansky's Youtube series
-# for introducing me to Emacs configuration.
+Built with help from Mike Zamansky's Youtube Tutorial
 
-* Basic Interface Tweaks
-** Basic QoL
+* Packages
+** auto-package-update
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-message t)  ; no message on opening emacs
-(tool-bar-mode -1)                ; no ugly toolbar at the top
-(fset 'yes-or-no-p 'y-or-n-p)     ; can answer 'y/n' to prompts, instead of 'yes/no'
-(setq save-interprogram-paste-before-kill t)   ; enables saving clipboard strings to emacs kill-ring
-(global-set-key (kbd "<f5>") 'revert-buffer)   ; reload buffer
+;; Auto update packages once a week
+(use-package auto-package-update
+  :ensure t
+  :commands (auto-package-update-maybe)
+  :config
+  (setq auto-package-update-delete-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe)
+  (add-hook 'auto-package-update-before-hook
+          (lambda () (message "I will update packages now")))
+  )
+#+END_SRC
+
+** trust melpa
+#+BEGIN_SRC emacs-lisp
+(require 'gnutls)
+(add-to-list 'gnutls-trustfiles "/usr/local/etc/openssl/cert.pem")
+#+END_SRC
+
+
+* Emacs meta
+** Bind super key to command
+#+BEGIN_SRC emacs-lisp
+(setq mac-command-modifier 'super) 
+(setq mac-option-modifier 'meta) 
+(setq mac-control-modifier 'control) ; make Control key do Control
+(setq ns-function-modifier 'hyper)  ; make Fn key do Hyper
+#+END_SRC
+
+
+* Basic Quality of Life
+** Open myinit.org
+#+BEGIN_SRC emacs-lisp
+  (defun init ()
+    (interactive)
+    (counsel-find-file "~/.emacs.d/myinit.org")
+    )
+#+END_SRC
+** Set default directory
+#+BEGIN_SRC emacs-lisp
+(setq default-directory "/Users/samtonetto/")
+#+END_SRC
+** Inhibit startup message
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t)
+#+END_SRC
+** No toolbar at top
+#+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+#+END_SRC
+** Change yes/no prompts to y/n prompts
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** Enable clipboard pasting into emacs kill-ring
+#+BEGIN_SRC emacs-lisp
+(setq save-interprogram-paste-before-kill t)
+#+END_SRC
+** F5 to Reload buffer
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<f5>") 'revert-buffer)
 #+END_SRC
 ** Silence the Bell
 #+BEGIN_SRC emacs-lisp
@@ -22,24 +76,21 @@
                                (lambda (fg) (set-face-foreground 'mode-line fg))
                                orig-fg))))
 #+END_SRC
-** Refining mouse/keyboard scrolling
+** Refine scrolling
 #+BEGIN_SRC emacs-lisp
 (setq mouse-wheel-scroll-amount '(10))
 (setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't)       ; scroll window under mouse
 (setq scroll-step 3)                     ; keyboard scroll 3 lines at a time
 #+END_SRC
-** Scroll window without moving cursor
-#+BEGIN_SRC emacs-lisp
-(global-set-key "\M-n" "\C-u1\C-v")
-(global-set-key "\M-p" "\C-u1\M-v")
-#+END_SRC
-** List command completions (which-key)
+** which-key (List command completions)
 If you type "C-x" or "C-c" and wait which-key will list possible command completions.
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :ensure t
-  :config (which-key-mode))
+  :config
+  (setq which-key-idle-delay 0.1)
+  (which-key-mode))
 #+END_SRC
 ** Prevent accidental exiting
 Quit with "C-x C-c C-x C-c" instead of "C-x C-c"
@@ -48,9 +99,70 @@ Quit with "C-x C-c C-x C-c" instead of "C-x C-c"
   (global-set-key (kbd "C-x C-c C-x C-c") 'save-buffers-kill-emacs)
 #+END_SRC
 
+** helm-descbinds (describe all bindings with helm)
+#+BEGIN_SRC emacs-lisp
+(use-package helm-descbinds)
+(helm-descbinds-mode)
+#+END_SRC
+
+** display-line-numbers-mode
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode 1)
+#+END_SRC
+
+
+* Shell
+** Make emacs use same shell as OSX terminal
+Make emacs use same shell that I use
+with package ""exec-path-from-shell"
+
+#+BEGIN_SRC emacs-lisp
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+#+END_SRC
+** Clear eshell
+#+BEGIN_SRC emacs-lisp
+;Clear the eshell buffer.
+(defun eshell/clear ()      
+   (let ((eshell-buffer-maximum-lines 0)) (eshell-truncate-buffer)))
+#+END_SRC
+
+** Set default ansi-term to zsh
+#+BEGIN_SRC emacs-lisp
+(setq explicit-shell-file-name "/bin/zsh")
+#+END_SRC
+
+** ansi-term char-mode/line-mode toggle
+Reminder that C-c C-j go to line-mode
+and that C-c C-k goes to char-mode
+
+#+BEGIN_SRC emacs-lisp
+  (defun clear-and-enter ()
+    (interactive)
+    (progn
+      (erase-buffer)
+      ;;      (term-send-input)
+      (execute-kbd-macro (read-kbd-macro "<RET>"))
+      ;;      (execute-kbd-macro (read-kbd-macro "C-l"))
+      (term-char-mode)
+      (execute-kbd-macro (read-kbd-macro "C-l"))
+      )
+    )
+
+    (add-hook 'term-mode-hook
+              (lambda ()
+                (local-set-key (kbd "C-c C-h") 'clear-and-enter)))
+#+END_SRC
+
+** Add brew compiler to path
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'exec-path "/usr/local/bin")
+#+END_SRC
+
+
 
 * Window Navigation
-** Ace-window
+** ace-window                                  (navigate windows by "C-x o <number>")
 Switch between multiple windows using "C-x o" by number.
 #+BEGIN_SRC emacs-lisp
 (use-package ace-window
@@ -64,7 +176,7 @@ Switch between multiple windows using "C-x o" by number.
        ((t (:inherit ace-jump-face-foreground :height 3.0)))))
     ))
 #+END_SRC
-** Framemove
+** framemove [not patched for Emacs 27 yet]    (navigate windows by "shift <arrowkey>")
 Use Shift + Arrowkeys to quickly switch windows.
 #+BEGIN_SRC emacs-lisp
   (use-package framemove
@@ -75,37 +187,59 @@ Use Shift + Arrowkeys to quickly switch windows.
     )
 #+END_SRC
 
-
-* General aesthetics
-** One of my favorite themes
+** window-numbering                            (navigate windows by "M-<number>")
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-themes
-    :config 
-    (load-theme 'doom-vibrant t))
+(use-package window-numbering
+  :ensure t
+  :config
+  (eval-when-compile
+    ;; Silence missing function warnings
+    (declare-function window-numbering-mode "window-numbering.el"))
+  (window-numbering-mode t)
+  )
 #+END_SRC
 
-** Colored Parentheses (rainbow delimiters)
+
+** window resizing keybindings
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t
-    :config
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+    (global-set-key (kbd "C-<") 'shrink-window-horizontally)
+    (global-set-key (kbd "C->") 'enlarge-window-horizontally)
+    (global-set-key (kbd "C-:") 'shrink-window)
+    (global-set-key (kbd "C-\"") 'enlarge-window)
 #+END_SRC
 
-** Default Fontsize
+
+* Aesthetics
+** Font
+*** Font Face
+#+BEGIN_SRC emacs-lisp
+(set-face-attribute 'default nil :family "Inconsolata" :height 140)
+#+END_SRC
+
+*** Font Size
 #+BEGIN_SRC emacs-lisp
 (set-face-attribute 'default nil :height 150)
 #+END_SRC
-** Default Cursor type
+
+** Theme
+*** Disable theme before loading new one
+#+BEGIN_SRC emacs-lisp
+(defadvice load-theme (before theme-dont-propagate activate)
+ (mapc #'disable-theme custom-enabled-themes))
+#+END_SRC
+*** Load Dracula Theme
+#+BEGIN_SRC emacs-lisp
+(load-theme 'dracula t)
+(set-face-foreground 'font-lock-comment-face "light goldenrod") ;; change comments col
+#+END_SRC
+
+** Cursor
+*** Cursor Style
 #+BEGIN_SRC emacs-lisp
 (setq-default cursor-type 'box)  ; other options: bar, hollow, hbar
 #+END_SRC
-** Highlight current line (hl-line)
-Apparently hl-line.el is included from Emacs 21 onwards.
-#+BEGIN_SRC emacs-lisp
-(global-hl-line-mode t)
-#+END_SRC
-** A light following your cursor around (beacon)
+
+*** beacon                 (a light following your cursor around)
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :ensure t
@@ -116,20 +250,61 @@ Apparently hl-line.el is included from Emacs 21 onwards.
 #+END_SRC
 
 
+** color-identifiers-mode (color matching variables)
+#+BEGIN_SRC emacs-lisp
+(use-package color-identifiers-mode
+  :ensure t
+  :init (add-hook 'after-init-hook 'global-color-identifiers-mode))
+#+END_SRC
+
+** rainbow-delimiters     (color matching parentheses)
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+#+END_SRC
+
+** global-hl-line-mode    (highlight current line)
+#+BEGIN_SRC emacs-lisp
+(global-hl-line-mode t)
+#+END_SRC
+** powerline              (stylize bar at bottom)
+#+BEGIN_SRC emacs-lisp
+(require 'powerline)
+(powerline-default-theme)
+#+END_SRC
+
+
+** Indentation guides     (mostly useful for python)
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook 'highlight-indent-guides-mode)
+(setq highlight-indent-guides-method 'column)
+(setq highlight-indent-guides-responsive 'top)
+#+END_SRC
+
+
 * Org Mode
-** Org-mode Setup
+** org-mode setup
 Org-mode is an Emacs major mode that does a lot of different things.
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :init
     (add-hook 'org-mode-hook (lambda () (org-indent-mode t)) t)  ; indents nested bullet points
-    (add-hook 'org-shiftup-final-hook 'windmove-up)              ; Shift + Up to move up a window
-    (add-hook 'org-shiftleft-final-hook 'windmove-left)          ; Shift + Left to move to left window
-    (add-hook 'org-shiftdown-final-hook 'windmove-down)          ; Shift + Down to move down a window
-    (add-hook 'org-shiftright-final-hook 'windmove-right)        ; Shift + Right to move to right window
+
+    (add-hook 'org-shiftup-hook 'windmove-up)              ; Shift + Up to move up a window
+    (add-hook 'org-shiftleft-hook 'windmove-left)          ; Shift + Left to move to left window
+    (add-hook 'org-shiftdown-hook 'windmove-down)          ; Shift + Down to move down a window
+    (add-hook 'org-shiftright-hook 'windmove-right)        ; Shift + Right to move to right window
+
+    ;; (add-hook 'org-shiftup-final-hook 'windmove-up)              ; Shift + Up to move up a window
+    ;; (add-hook 'org-shiftleft-final-hook 'windmove-left)          ; Shift + Left to move to left window
+    ;; (add-hook 'org-shiftdown-final-hook 'windmove-down)          ; Shift + Down to move down a window
+    ;; (add-hook 'org-shiftright-final-hook 'windmove-right)        ; Shift + Right to move to right window
+
     )
 #+END_SRC
-** Org-bullets (aesthetic)
+** org-bullets (aesthetic bullet points)
 Shows org-mode bullets as UTF-8 characters instead of asterisks.
 Only works in GUI emacs - may not work in terminal.
 #+BEGIN_SRC emacs-lisp
@@ -140,189 +315,349 @@ Only works in GUI emacs - may not work in terminal.
 #+END_SRC
 
 
+** preserve indents after exiting org edit mode
+#+BEGIN_SRC emacs-lisp
+(setq org-edit-src-content-indentation 0
+      org-src-tab-acts-natively t
+      org-src-preserve-indentation t)
+#+END_SRC
+
+** load python for use in org mode
+
+Note: if you get a python-shell-interpreter readline error,
+add this to your ~/.inputrc file without quotes:
+
+"# .inputrc
+$if Bash
+set colored-stats on
+$endif"
+
+If you don't have an .inputrc file, make one.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-babel-python-command "/usr/local/bin/python3")
+
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (shell . t)
+     (C . t)
+     (emacs-lisp . t)))
+  )
+#+END_SRC
+
+
+* Latex
+** AucTex path
+#+BEGIN_SRC emacs-lisp
+(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))  
+(setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+#+END_SRC
+
+
 * Code Editing
-** Set default indentation style
+
+** Code completion
+
+*** lsp-mode
+ https://github.com/MatthewZMD/.emacs.d/tree/master/elisp
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :defer t
+  :commands lsp
+  :custom
+  (lsp-auto-guess-root nil)               ;; Automatically guess project root using projectile.
+  (lsp-prefer-flymake nil)                ;; Use (the more modern) flycheck instead of flymake for syntax checking.
+  (lsp-file-watch-threshold 2000)         
+  (read-process-output-max (* 1024 1024)) ;; Control how much data emacs can read in one pass from server. For efficiency.
+  (lsp-eldoc-hook nil)                    
+
+  :bind
+  (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
+  :hook
+  ((java-mode python-mode go-mode
+              js-mode js2-mode typescript-mode web-mode
+              c-mode c++-mode objc-mode) . lsp)
+  )
+#+END_SRC
+
+*** lsp-clangd
+#+BEGIN_SRC emacs-lisp
+;; (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd")
+;; (setq lsp-clients-clangd-executable "/usr/local/opt/llvm/bin/clangd")
+#+END_SRC
+
+*** lsp-ui
+#+BEGIN_SRC emacs-lisp
+;; (use-package lsp-ui
+;;   :after lsp-mode
+;;   :diminish
+;;   :commands lsp-ui-mode
+;;   :custom-face
+;;   (lsp-ui-doc-background ((t (:background nil))))
+;;   (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+;;   :bind
+;;   (:map lsp-ui-mode-map
+;;         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+;;         ([remap xref-find-references] . lsp-ui-peek-find-references)
+;;         ("C-c u" . lsp-ui-imenu)
+;;         ("M-i" . lsp-ui-doc-focus-frame))
+;;   (:map lsp-mode-map
+;;         ("M-n" . forward-paragraph)
+;;         ("M-p" . backward-paragraph))
+;;   :custom
+;;   (lsp-ui-doc-header t)                           ;; Whether or not to enable the header which displays the symbol string.
+;;   (lsp-ui-doc-include-signature t)                ;; Whether or not to include the object signature/type in the frame.
+;;   (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
+;;   (lsp-ui-sideline-enable nil)                    ;; Whether or not to enable lsp-ui-sideline
+;;   (lsp-ui-sideline-ignore-duplicate t)            ;; Ignore duplicates when there is a same symbol with same contents
+;;   (lsp-ui-sideline-show-code-actions nil)         ;; Whether to show code actions in sideline.
+;; )
+#+END_SRC
+
+*** company (autocompletion framework with pluggable backends)
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package company
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq company-idle-delay 0)
+  ;;   (setq company-minimum-prefix-length 3)
+
+  ;;   (global-company-mode t))
+#+END_SRC
+
+
+
+
+*** disable lsp-enable-on-type-formatting
+#+BEGIN_SRC emacs-lisp
+;;(setq lsp-enable-on-type-formatting nil)
+#+END_SRC
+
+
+** Add to c++ mode
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.tpp" . c++-mode))
+#+END_SRC
+
+** yasnippet
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+  :ensure t
+  :init
+  (yas-global-mode 1))
+#+END_SRC
+
+** vimish-fold
+#+BEGIN_SRC emacs-lisp
+(use-package vimish-fold
+  :ensure t
+  :config
+  (progn
+    (vimish-fold-global-mode 1)
+    (global-set-key (kbd "C-M-x") #'vimish-fold)
+    (global-set-key (kbd "C-M-d") #'vimish-fold-delete)
+    (global-set-key (kbd "C-M-c") #'vimish-fold-toggle)
+    (global-set-key (kbd "C-M-f") #'vimish-fold-toggle-all)
+    ))
+#+END_SRC
+
+
+** Set default indent to 4
 #+BEGIN_SRC emacs-lisp
 (setq c-default-style "bsd"
         c-basic-offset 4)
 #+END_SRC
 
-** Code Snippets (yasnippet)
-#+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :init
-    (yas-global-mode 1))
-#+END_SRC
-
-** Code Folding (vimish-fold)
-#+BEGIN_SRC emacs-lisp
-  (use-package vimish-fold
-    :ensure t
-    :config
-    (progn
-      (vimish-fold-global-mode 1)
-      (global-set-key (kbd "C-M-x") #'vimish-fold)
-      (global-set-key (kbd "C-M-d") #'vimish-fold-delete)
-      (global-set-key (kbd "C-M-c") #'vimish-fold-toggle)
-      (global-set-key (kbd "C-M-f") #'vimish-fold-toggle-all)
-      ))
-#+END_SRC
-
-** Lua mode
-#+BEGIN_SRC emacs-lisp
-(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
-    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-    (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
-#+END_SRC
-
-** Web mode
-#+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (setq web-mode-engines-alist
-	  '(("django" . "\\.html\\'")))
-    (setq web-mode-ac-sources-alist
-	  '(("css" . (ac-source-css-property))
-	    ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
-    (setq web-mode-enable-auto-closing t))
-#+END_SRC
-
-** Add .tpp to C++ mode
-A .tpp file is usually used to store templates.
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.tpp" . c++-mode))
-#+END_SRC
-
-** Line numbers (linum-mode)
-#+BEGIN_SRC emacs-lisp
-(global-linum-mode 1)
-(setq linum-format "%d")
-
-(defun nolinum ()
-  (global-linum-mode 0)
-)
-(add-hook 'org-mode-hook 'nolinum)
-#+END_SRC
-
-** Column numbers
-#+BEGIN_SRC emacs-lisp
-(setq column-number-mode t)
-#+END_SRC
-** Aggressive indentation (aggressive-indent)
-Indenting one line should indent lines below it too.
-Disabled for modes where it wouldn't make sense, like python-mode.
-#+BEGIN_SRC emacs-lisp
-(use-package aggressive-indent
-    :ensure t
-    :config
-    (global-aggressive-indent-mode 1))
-#+END_SRC
-
-** simple auto-complete (auto-complete)
-#+BEGIN_SRC emacs-lisp
-  (use-package auto-complete
-    :ensure t
-    :init
-    (progn
-      (ac-config-default)
-      (global-auto-complete-mode t)
-      ))
-#+END_SRC
-
 
 * Project/Document Navigation
-** Better buffer list (ibuffer)
+** ibuffer (better buffer list)
 A better version of the default buffer list, which is enabled using "C-x C-b".
 #+BEGIN_SRC emacs-lisp
 (defalias 'list-buffers 'ibuffer)
 #+END_SRC
-** Project Management (projectile)
+
+** counsel-etags
+
+To use counsel-etags, must create TAGS file in project home directory.
+e.g. "ctags -e -R ." to recursively create tags.
+     "ctags -e -R *.cpp *.hpp *.h" to filter specific extensions.
+     "ctags -e myfile.cpp" to tag just one file.
+In all cases the '-e' flag is required so that ctags will generate an emacs tags file.
+
 #+BEGIN_SRC emacs-lisp
-(use-package projectile
-   :ensure t
-   :config
-   (projectile-global-mode)
-   (setq projectile-completion-system 'ivy))
-(use-package counsel-projectile
-   :ensure t
-   :config
-   (counsel-projectile-mode))
+  ;; Use universal ctags to build the tags database for the project.
+  ;; When you first want to build a TAGS database run 'touch TAGS'
+  ;; in the root directory of your project.
+  (use-package counsel-etags
+    :ensure t
+    :init
+    (eval-when-compile
+      ;; Silence missing function warnings
+      (declare-function counsel-etags-virtual-update-tags "counsel-etags.el")
+      (declare-function counsel-etags-guess-program "counsel-etags.el")
+      (declare-function counsel-etags-locate-tags-file "counsel-etags.el"))
+    :bind (
+           ("M-." . counsel-etags-find-tag-at-point)
+           ("M-t" . counsel-etags-grep-symbol-at-point))
+    :config
+    ;; Ignore files above 800kb
+    (setq counsel-etags-max-file-size 800)
+    ;; Ignore build directories for tagging
+    (add-to-list 'counsel-etags-ignore-directories '"build*")
+    (add-to-list 'counsel-etags-ignore-directories '".vscode")
+    (add-to-list 'counsel-etags-ignore-filenames '".clang-format")
+    ;; Don't ask before rereading the TAGS files if they have changed
+    (setq tags-revert-without-query t)
+    ;; Don't warn when TAGS files are large
+    (setq large-file-warning-threshold nil)
+    ;; How many seconds to wait before rerunning tags for auto-update
+    (setq counsel-etags-update-interval 180)
+    ;; Set up auto-update
+    (add-hook
+     'prog-mode-hook
+     (lambda () (add-hook 'after-save-hook
+                          (lambda ()
+                            (counsel-etags-virtual-update-tags)))))
+
+    ;; The function provided by counsel-etags is broken (at least on Linux)
+    ;; and doesn't correctly exclude directories, leading to an excessive
+    ;; amount of incorrect tags. The issue seems to be that the trailing '/'
+    ;; in e.g. '*dirname/*' causes 'find' to not correctly exclude all files
+    ;; in that directory, only files in sub-directories of the dir set to be
+    ;; ignore.
+    (defun my-scan-dir (src-dir &optional force)
+      "Create tags file from SRC-DIR. \
+     If FORCE is t, the commmand is executed without \
+     checking the timer."
+      (let* ((find-pg (or
+                       counsel-etags-find-program
+                       (counsel-etags-guess-program "find")))
+             (ctags-pg (or
+                        counsel-etags-tags-program
+                        (format "%s -e -L" (counsel-etags-guess-program
+                                            "ctags"))))
+             (default-directory src-dir)
+             ;; run find&ctags to create TAGS
+             (cmd (format
+                   "%s . \\( %s \\) -prune -o -type f -not -size +%sk %s | %s -"
+                   find-pg
+                   (mapconcat
+                    (lambda (p)
+                      (format "-iwholename \"*%s*\"" p))
+                    counsel-etags-ignore-directories " -or ")
+                   counsel-etags-max-file-size
+                   (mapconcat (lambda (n)
+                                (format "-not -name \"%s\"" n))
+                              counsel-etags-ignore-filenames " ")
+                   ctags-pg))
+             (tags-file (concat (file-name-as-directory src-dir) "TAGS"))
+             (doit (or force (not (file-exists-p tags-file)))))
+        ;; always update cli options
+        (when doit
+          (message "%s at %s" cmd default-directory)
+          (async-shell-command cmd)
+          (visit-tags-table tags-file t))))
+
+    (setq counsel-etags-update-tags-backend
+          (lambda ()
+            (interactive)
+            (let* ((tags-file (counsel-etags-locate-tags-file)))
+              (when tags-file
+                (my-scan-dir (file-name-directory tags-file) t)
+                (run-hook-with-args
+                 'counsel-etags-after-update-tags-hook tags-file)
+                (unless counsel-etags-quiet-when-updating-tags
+                  (message "%s is updated!" tags-file))))))
+    )
+
+  (use-package flyspell-correct-ivy
+    :ensure t
+    :after (:all flyspell ivy))
+
+  (use-package lsp-ivy
+    :ensure t
+    :diminish
+    :after (:all lsp-mode ivy))
+
 #+END_SRC
 
 
-* Search and Replace 
-** Kill-ring search (counsel)
-Search through your kill-ring history.
-Also seems to be required for swiper.
-#+BEGIN_SRC emacs-lisp
-(use-package counsel
-  :ensure t
-  :bind ("M-y" . counsel-yank-pop)
-  )
-#+END_SRC
-
-** Document search (swiper)
+* Search
+** swiper (search current document)
 Regexp search through current document with "C-s". Seems to require counsel.
 #+BEGIN_SRC emacs-lisp
-(use-package swiper
-  :ensure t
-  :config
-  (progn
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (global-set-key "\C-s" 'swiper)  ; this is the main command
-    (global-set-key (kbd "C-c C-r") 'ivy-resume)  ; dunno what this does
-    (global-set-key (kbd "<f6>") 'ivy-resume)
-    (global-set-key (kbd "M-x") 'counsel-M-x)
-    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-    (global-set-key (kbd "<f1> l") 'counsel-load-library)
-    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-    (global-set-key (kbd "C-c g") 'counsel-git)
-    (global-set-key (kbd "C-c j") 'counsel-git-grep)
-    (global-set-key (kbd "C-c k") 'counsel-ag)
-    (global-set-key (kbd "C-x l") 'counsel-locate)
-    (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    ))
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+;; enable this if you want `swiper' to use it
+(setq search-default-mode #'char-fold-to-regexp)
+(global-set-key "\C-s" 'swiper)
+;;(global-set-key (kbd "C-c C-r") 'ivy-resume)
+;;(global-set-key (kbd "<f6>") 'ivy-resume)
+;;(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+;;(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+;;p(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+;;(global-set-key (kbd "<f1> l") 'counsel-find-library)
+;;(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+;;(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+;;(global-set-key (kbd "C-c g") 'counsel-git)
+;;(global-set-key (kbd "C-c j") 'counsel-git-grep)
+;;(global-set-key (kbd "C-c k") 'counsel-ag)
+;;(global-set-key (kbd "C-x l") 'counsel-locate)
+;;(global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+;;(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+
+  ;; (use-package swiper
+  ;;   :ensure t
+  ;;   :config
+  ;;   (progn
+  ;;     (ivy-mode 1)
+  ;;     (setq ivy-use-virtual-buffers t)
+  ;;     (global-set-key "\C-s" 'swiper)  ; this is the main command
+  ;;     (global-set-key (kbd "C-c C-r") 'ivy-resume)  ; dunno what this does
+  ;;     (global-set-key (kbd "<f6>") 'ivy-resume)
+  ;;     (global-set-key (kbd "M-x") 'counsel-M-x)
+  ;;     (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  ;;     (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  ;;     (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  ;;     (global-set-key (kbd "<f1> l") 'counsel-load-library)
+  ;;     (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  ;;     (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+  ;;     (global-set-key (kbd "C-c g") 'counsel-git)
+  ;;     (global-set-key (kbd "C-c j") 'counsel-git-grep)
+  ;;     (global-set-key (kbd "C-c k") 'counsel-ag)
+  ;;     (global-set-key (kbd "C-x l") 'counsel-locate)
+  ;;     (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+  ;;     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+  ;;     ))
 #+END_SRC
-** Screen search (avy)
-Avy searches only text visible on the current screen.
-It is based on ace-jump-mode from vim. Enable it using "M-s".
-#+BEGIN_SRC emacs-lisp
-(use-package avy
-  :ensure t
-  :bind ("M-s" . avy-goto-char))
-#+END_SRC
-** Simultaneous editing of regexp (iedit)
+
+** iedit (simultaneous editing)
+
+Keybinding is "C-;".
+
+Select a region, press C-;, and you will simultaneously edit
+all matching regions in the document.
+
 #+BEGIN_SRC emacs-lisp
 (use-package iedit
     :ensure t)
 #+END_SRC
 
-** Search undo history (undo-tree)
-Activate using "C-x u"
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-    :ensure t
-    :init
-    (global-undo-tree-mode 1))
-#+END_SRC
+** expand-region (progressively expand selection around cursor)
 
+Keybinding is "C-=".
 
-* Selection
-** Progressively expand selection around cursor (expand-region)
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :ensure t
     :config
     (global-set-key (kbd "C-=") 'er/expand-region))
 #+END_SRC
+
 ** Narrow or widen region
 Defines "C-x C-n" to narrow region around selection. 
 If already in narrowed region, "C-x C-n" widens it again.
@@ -370,190 +705,89 @@ Credit goes to Artur Malabarba and Michael Fogleman.
 #+END_SRC
 
 
-* LaTeX in Emacs
-** Put pdflatex in PATH (specialized to MAC)
+
+* Contents of junk files in .emacs.d
+** bell-init.el
 #+BEGIN_SRC emacs-lisp
-  (getenv "PATH")
-  (setenv "PATH"
-          (concat
-           "/Library/TeX/texbin/" ":"
-	   "/usr/local/bin" ":"
-           "/usr/local/lib/pkgconfig" ":" 
-           "/opt/X11/lib/pkgconfig" ":"
-           (getenv "PATH")
-	   )
-)
-(setq exec-path (append exec-path '("/usr/local/bin")))
+;;(setq visible-bell 1)
 #+END_SRC
 
-** pdf-tools
-Install epdfinfo via 'brew install pdf-tools' and then install the
-pdf-tools elisp via the use-package below. To upgrade the epdfinfo
-server, just do 'brew upgrade pdf-tools' prior to upgrading to newest
-pdf-tools package using Emacs package system. If things get messed
-up, just do 'brew uninstall pdf-tools', wipe out the elpa
-pdf-tools package and reinstall both as at the start.
+** eshell-init.el
 #+BEGIN_SRC emacs-lisp
-(use-package pdf-tools
-  :ensure t
-  :config
-  (custom-set-variables
-    '(pdf-tools-handle-upgrades nil)) ; Use brew upgrade pdf-tools instead.
-  (setq pdf-info-epdfinfo-program "/usr/local/bin/epdfinfo"))
-(pdf-tools-install)
-#+END_SRC
-
-** pdf-view with AucTeX
-#+BEGIN_SRC emacs-lisp
- ;; to use pdfview with auctex
- (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-    TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-    TeX-source-correlate-start-server t) ;; not sure if last line is neccessary
-
- ;; to have the buffer refresh after compilation
- (add-hook 'TeX-after-compilation-finished-functions
-        #'TeX-revert-document-buffer)
-#+END_SRC
-
-** Enable org-table in LaTeX
-Note: 'latex-mode-hook is Emacs' in-built LaTeX, while 'LaTeX-mode-hook is AucTeX.
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'LaTeX-mode-hook 'turn-on-orgtbl)
-  (add-hook 'LaTeX-mode-hook 'orgtbl-mode)
+;; (defun eshell/clear ()
+;;  "Clear the eshell buffer."
+;;  (let ((inhibit-read-only t))
+;;    (erase-buffer)
+;;        (eshell-send-input)))
 #+END_SRC
 
 
-* Miscellany
-** try
-Lets you try out packages temporarily with "M-x try"
+** coding-init.el
 #+BEGIN_SRC emacs-lisp
-(use-package try
-  :ensure t)
+;; (require-package 'paredit)
 #+END_SRC
-
-** load-file
-A function that loads an elipso file only if it exists and is readable
-e.g. (load-if-exists "~/Dropbox/shared/mu4econfig.el")
+** god-init.el
 #+BEGIN_SRC emacs-lisp
-  (defun load-if-exists (f)
-      "loads the elisp file only if it exists and is readable"
-      (if (file-readable-p f)
-	  (load-file f)))
+;;;;; ============== BIND <escape> to ESC =====================                          
+;;;;; https://github.com/chrisdone/god-mode/issues/43 SOLUTION TO ESCAPE KEY             
+;;(defvar personal/fast-keyseq-timeout 200)
+;;
+;;(defun personal/-tty-ESC-filter (map)
+;;  (if (and (equal (this-single-command-keys) [?\e])
+;;           (sit-for (/ personal/fast-keyseq-timeout 1000.0)))
+;;      [escape] map))
+;;
+;;(defun personal/-lookup-key (map key)
+;;  (catch 'found
+;;    (map-keymap (lambda (k b) (if (equal key k) (throw 'found b))) map)))
+;;
+;;(defun personal/catch-tty-ESC ()
+;;  "Setup key mappings of current terminal to turn a tty's ESC into `escape'."
+;;  (when (memq (terminal-live-p (frame-terminal)) '(t pc))
+;;    (let ((esc-binding (personal/-lookup-key input-decode-map ?\e)))
+;;      (define-key input-decode-map
+;;        [?\e] `(menu-item "" ,esc-binding :filter personal/-tty-ESC-filter)))))
+;;
+;;(personal/catch-tty-ESC)
+;;; =======================================================                            
+;;
+;;
+;;(require 'god-mode)
+;; (global-set-key (kbd "<escape>") 'god-local-mode)
+;;
+;;; Change cursor if in god mode                                                       
+;;(defun my-update-cursor ()
+;;  (setq cursor-type (if (or god-local-mode buffer-read-only) 'bar 'box)))
+;;
+;;(eval-after-load 'god-local-mode
+;;  '(progn
+;;     (add-hook 'god-mode-enabled-hook 'my-update-cursor)
+;;     (add-hook 'god-mode-disabled-hook 'my-update-cursor)))
 #+END_SRC
-
-** Neo-tree
+** paradox-init.el
 #+BEGIN_SRC emacs-lisp
-(use-package neotree
-   :ensure t
-   :config
-   (global-set-key [f8] 'neotree-toggle)
-   (setq neo-smart-open t)
-   (setq projectile-switch-project-action 'neotree-projectile-action))
+;; (setq paradox-github-token "238f6f79c981fbd612537b56a83cba310c069563")
 #+END_SRC
-
-** imenu
+** ace-window-init.el
 #+BEGIN_SRC emacs-lisp
- (global-set-key (kbd "C-.") #'helm-imenu-anywhere)
+;;;;; ============== ACE WINDOW MACRO =========================                          
+;;(global-set-key (kbd "M-p") 'ace-window)
+;;;;; =========================================================   
 #+END_SRC
-
-
-* Unfinished, incomplete or possibly redundant
-** Smooth Scroll
+** outline-mode-init.el
 #+BEGIN_SRC emacs-lisp
-(use-package smooth-scroll
-:ensure t
-:config
-  (smooth-scroll-mode 1)
-  (setq smooth-scroll/vscroll-step-size 5)
-  )
+;;;;; OUTLINE MODE                                                                       
+;;;;; allows hiding of some parts of text file                                           
+;;;;; i.e. folding sections, subsections, chapters                                       
+;;;;; Hide current section: C-c C-o C-l                                                  
+;;;;; Move to next unit of doc: C-c C-o C-n                                              
+;;;;; Move to prev unit of doc: C-c C-o C-p                                              
+;;;;; See whole doc again: C-c C-o C-a                                                   
+;;(defun turn-on-outline-minor-mode ()
+;;(outline-minor-mode 1))
+;;
+;;(add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
+;;(add-hook 'latex-mode-hook 'turn-on-outline-minor-mode)
+;;(setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else                       
+;;;;; END OUTLINE MODE            
 #+END_SRC
-
-** (INCOMPLETE) reveal.js
-#+BEGIN_SRC emacs-lisp
-;;;(use-package ox-reveal
-;;;:ensure ox-reveal)
-
-;;;(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
-;;;(setq org-reveal-mathjax t)
-
-;;;(use-package htmlize
-;;;:ensure t)
-#+END_SRC
-
-** Flycheck
-#+BEGIN_SRC emacs-lisp
-;;;  (use-package flycheck
-;;;    :ensure t
-;;;    :init
-;;;    (global-flycheck-mode t))
-#+END_SRC
-** Python Jedi
-
-#+BEGIN_SRC emacs-lisp
-;;;  (use-package jedi
-;;;    :ensure t
-;;;    :init
-;;;    (add-hook 'python-mode-hook 'jedi:setup)
-;;;    (add-hook 'python-mode-hook 'jedi:ac-setup))
-;;;  (use-package elpy
-;;;    :ensure t
-;;;    :config
-;;;    (elpy-enable))
-#+END_SRC
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-** Dumb jump
-#+BEGIN_SRC emacs-lisp
-(use-package dumb-jump
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g i" . dumb-jump-go-prompt)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
-  :config (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
-  :ensure
-  :init
-  (dumb-jump-mode))
-#+END_SRC
-
-
-
-** Python indent guide
-#+BEGIN_SRC emacs-lisp
- ;;; (use-package indent-guide
-   ;;; :ensure t
-   ;;; :config (indent-guide-global-mode))
-#+END_SRC
-   
-
-
-
-
-
-
