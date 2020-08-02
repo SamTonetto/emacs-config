@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: scw
+# key: scw
+# --
+System.Console.WriteLine($1);
+$0

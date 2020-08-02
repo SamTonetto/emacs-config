@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: table
+# key: table
+# type: command
+# --
+(let ((nrows (read-number "Num Rows: "))
+      (ncols (read-number "Num Cols: ")))
+
+  (yas-expand-snippet
+    (concat
+      "\\left\\begin{matrix} \n"
+      "\t"
+      (mapconcat	
+     	(lambda (num) (format "${%d:%d}" num num))
+        (number-sequence 1 ncols nil)
+	" & "
+      )
+      " \\\\\\\\ \n"
+    )
+  )
+)
+
+;;;(yas-expand-snippet
+;;;	(concat (concat "a" "b") " c")))

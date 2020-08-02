@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: pmat
+# key: pmat
+# expand-env: ((yas-indent-line 'fixed))
+# --
+
+\left(\begin{matrix}
+  $0
+\end{matrix}\right)

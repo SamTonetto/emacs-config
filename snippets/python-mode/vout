@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vout
+# key: vout
+# --
+print("${1:var} = ", $1)$0

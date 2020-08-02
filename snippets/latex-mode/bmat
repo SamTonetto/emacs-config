@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: bmat
+# key: bmat
+# expand-env: ((yas-indent-line 'fixed))
+# --
+\left[\begin{matrix}
+  $0
+\end{matrix}\right]

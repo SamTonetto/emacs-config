@@ -1,0 +1,29 @@
+CXX=g++-9
+
+f="fast"
+
+ifeq ($(f),"false")
+CXXFLAGS=-std=c++17 -Wshadow -Wall -fsanitize=address -fsanitize=undefined -g -MMD #-D_GLIBCXX_DEBUG
+else
+CXXFLAGS=-std=c++17 -O3 -Wno-unused-result -Wshadow -Wall
+endif
+
+SRCS := $(wildcard *.cpp)
+OBJS := $(patsubst %.cpp,%.o,$(SRCS))
+TARGETS := $(patsubst %.cpp,%,$(SRCS))
+
+-include $(OBJS:.o=.d)
+
+main: $(TARGETS)
+	$(CXX) -o $@ $^
+
+.PHONY: clean $(SRCS)
+
+clean:
+	$(RM) *~ *.o *.d $(TARGETS)
+	$(RM) -rf *.dSYM
+
+print:
+	@echo $(SRCS)
+	@echo $(OBJS)
+	@echo $(TARGETS)

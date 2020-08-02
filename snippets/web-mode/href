@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: href
+# key: href
+# --
+<a href="$1">
+    $0
+</a>

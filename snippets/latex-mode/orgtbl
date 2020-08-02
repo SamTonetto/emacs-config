@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: orgtbl
+# key: orgtbl
+# type: command
+# --
+(orgtbl-insert-radio-table)

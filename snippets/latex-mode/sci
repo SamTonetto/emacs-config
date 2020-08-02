@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sci
+# key: sci
+# --
+$1 \times 10^{$2}$0

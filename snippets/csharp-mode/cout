@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: cout
+# key: cout
+# --
+Debug.Log($1);
+$0

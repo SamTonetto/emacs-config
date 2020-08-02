@@ -1,0 +1,22 @@
+# -*- mode: snippet -*-
+# name: dfs
+# key: dfs
+# --
+#!/bin/bash
+
+# Compare two programs on a file of test cases.
+
+echo "Test generator: "
+read gen
+
+echo "Script 1: "
+read script1
+
+echo "Script 2: "
+read script2
+
+for((i = 1; i <= 10000; ++i)); do
+    echo "Test case: $i"
+    ./$gen $i > testfile
+    diff -w <(./$script1 < testfile) <(./$script2 < testfile) || break
+done

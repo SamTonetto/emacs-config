@@ -35,7 +35,7 @@ Built with help from Mike Zamansky's Youtube Tutorial
 
 
 * Basic Quality of Life
-** Open myinit.org
+** Keyboard shortcut to open myinit.org
 #+BEGIN_SRC emacs-lisp
   (defun init ()
     (interactive)
@@ -322,7 +322,7 @@ Only works in GUI emacs - may not work in terminal.
       org-src-preserve-indentation t)
 #+END_SRC
 
-** load python for use in org mode
+** load languages for use in org-mode code  blocks
 
 Note: if you get a python-shell-interpreter readline error,
 add this to your ~/.inputrc file without quotes:
@@ -343,8 +343,36 @@ If you don't have an .inputrc file, make one.
    '((python . t)
      (shell . t)
      (C . t)
-     (emacs-lisp . t)))
-  )
+     (emacs-lisp . t))))
+
+(add-to-list 'org-src-lang-modes '("html" . web))
+
+#+END_SRC
+
+
+
+** images
+
+To display an image in org-mode, you can first of all optionally include
+any number of the following properties in the lines just before the image:
+
+#+NAME: fig:figure name
+#+CAPTION: figure name
+#+ATTR_ORG: :width 200
+#+ATTR_LATEX: :width 2.0in
+#+ATTR_HTML: :width 200
+
+Then, to include the image, 
+1. write a "[" twice, then 
+2. write file:<path to image>
+3. write "]" twice. 
+This creates a hyperlink to the image.
+
+To toggle displaying inline, use keybinding "C-c C-x C-v"
+
+#+BEGIN_SRC emacs-lisp
+(setq org-startup-with-inline-images t)
+(setq org-image-actual-width nil)
 #+END_SRC
 
 
@@ -384,55 +412,54 @@ If you don't have an .inputrc file, make one.
 
 *** lsp-clangd
 #+BEGIN_SRC emacs-lisp
-;; (setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd")
-;; (setq lsp-clients-clangd-executable "/usr/local/opt/llvm/bin/clangd")
+(setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd")
+(setq lsp-clients-clangd-executable "/usr/local/opt/llvm/bin/clangd")
 #+END_SRC
 
 *** lsp-ui
 #+BEGIN_SRC emacs-lisp
-;; (use-package lsp-ui
-;;   :after lsp-mode
-;;   :diminish
-;;   :commands lsp-ui-mode
-;;   :custom-face
-;;   (lsp-ui-doc-background ((t (:background nil))))
-;;   (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
-;;   :bind
-;;   (:map lsp-ui-mode-map
-;;         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-;;         ([remap xref-find-references] . lsp-ui-peek-find-references)
-;;         ("C-c u" . lsp-ui-imenu)
-;;         ("M-i" . lsp-ui-doc-focus-frame))
-;;   (:map lsp-mode-map
-;;         ("M-n" . forward-paragraph)
-;;         ("M-p" . backward-paragraph))
-;;   :custom
-;;   (lsp-ui-doc-header t)                           ;; Whether or not to enable the header which displays the symbol string.
-;;   (lsp-ui-doc-include-signature t)                ;; Whether or not to include the object signature/type in the frame.
-;;   (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
-;;   (lsp-ui-sideline-enable nil)                    ;; Whether or not to enable lsp-ui-sideline
-;;   (lsp-ui-sideline-ignore-duplicate t)            ;; Ignore duplicates when there is a same symbol with same contents
-;;   (lsp-ui-sideline-show-code-actions nil)         ;; Whether to show code actions in sideline.
-;; )
+(use-package lsp-ui
+  :after lsp-mode
+  :diminish
+  :commands lsp-ui-mode
+  :custom-face
+  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+  :bind
+  (:map lsp-ui-mode-map
+        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+        ("C-c u" . lsp-ui-imenu)
+        ("M-i" . lsp-ui-doc-focus-frame))
+  (:map lsp-mode-map
+        ("M-n" . forward-paragraph)
+        ("M-p" . backward-paragraph))
+  :custom
+  (lsp-ui-doc-header t)                           ;; Whether or not to enable the header which displays the symbol string.
+  (lsp-ui-doc-include-signature t)                ;; Whether or not to include the object signature/type in the frame.
+  (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
+  (lsp-ui-sideline-enable nil)                    ;; Whether or not to enable lsp-ui-sideline
+  (lsp-ui-sideline-ignore-duplicate t)            ;; Ignore duplicates when there is a same symbol with same contents
+  (lsp-ui-sideline-show-code-actions nil)         ;; Whether to show code actions in sideline.
+ )
 #+END_SRC
 
 *** company (autocompletion framework with pluggable backends)
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package company
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq company-idle-delay 0)
-  ;;   (setq company-minimum-prefix-length 3)
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
 
-  ;;   (global-company-mode t))
+    (global-company-mode t))
 #+END_SRC
-
 
 
 
 *** disable lsp-enable-on-type-formatting
 #+BEGIN_SRC emacs-lisp
-;;(setq lsp-enable-on-type-formatting nil)
+(setq lsp-enable-on-type-formatting nil)
 #+END_SRC
 
 
@@ -442,12 +469,34 @@ If you don't have an .inputrc file, make one.
 #+END_SRC
 
 ** yasnippet
+
+Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
+<tab> just moves to next field.
+
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
   :ensure t
   :init
   (yas-global-mode 1))
+
+;; Set key to backtab
+
+(setq yas-triggers-in-field t)
+
+;; Note: 
+;; yas-keymap is the active keymap while a snippet expansion is in progress
+;; in contrast to yas-minor-mode-map, which is the keymap outside of snippet expansion.
+
+(define-key yas-minor-mode-map (kbd "TAB") nil)
+(define-key yas-minor-mode-map (kbd "<tab>") nil)
+(define-key yas-minor-mode-map (kbd "<backtab>") yas-maybe-expand)
+(define-key yas-minor-mode-map (kbd "<S-tab>") yas-maybe-expand)
+(define-key yas-keymap (kbd "<backtab>") yas-maybe-expand)
+(define-key yas-keymap (kbd "<S-tab>") yas-maybe-expand)
 #+END_SRC
+
+
+
 
 ** vimish-fold
 #+BEGIN_SRC emacs-lisp
@@ -470,6 +519,37 @@ If you don't have an .inputrc file, make one.
         c-basic-offset 4)
 #+END_SRC
 
+
+
+
+* Web modes
+
+** web-mode major mode loading
+#+BEGIN_SRC emacs-lisp
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+#+END_SRC
+
+** indentation defaults
+#+BEGIN_SRC emacs-lisp
+(setq web-mode-markup-indent-offset 4)
+(setq web-mode-css-indent-offset 4)
+(setq web-mode-code-indent-offset 4)
+(setq web-mode-enable-current-element-highlight nil)
+(setq web-mode-enable-current-column-highlight t)
+
+(defun my-web-mode-auto-indent-hook ()
+  (local-set-key (kbd "RET") 'newline-and-indent))
+
+(add-hook 'web-mode-hook 'my-web-mode-auto-indent-hook)
+#+END_SRC
 
 * Project/Document Navigation
 ** ibuffer (better buffer list)
@@ -705,88 +785,3 @@ Credit goes to Artur Malabarba and Michael Fogleman.
 #+END_SRC
 
 
-
-* Contents of junk files in .emacs.d
-** bell-init.el
-#+BEGIN_SRC emacs-lisp
-;;(setq visible-bell 1)
-#+END_SRC
-
-** eshell-init.el
-#+BEGIN_SRC emacs-lisp
-;; (defun eshell/clear ()
-;;  "Clear the eshell buffer."
-;;  (let ((inhibit-read-only t))
-;;    (erase-buffer)
-;;        (eshell-send-input)))
-#+END_SRC
-
-** coding-init.el
-#+BEGIN_SRC emacs-lisp
-;; (require-package 'paredit)
-#+END_SRC
-** god-init.el
-#+BEGIN_SRC emacs-lisp
-;;;;; ============== BIND <escape> to ESC =====================                          
-;;;;; https://github.com/chrisdone/god-mode/issues/43 SOLUTION TO ESCAPE KEY             
-;;(defvar personal/fast-keyseq-timeout 200)
-;;
-;;(defun personal/-tty-ESC-filter (map)
-;;  (if (and (equal (this-single-command-keys) [?\e])
-;;           (sit-for (/ personal/fast-keyseq-timeout 1000.0)))
-;;      [escape] map))
-;;
-;;(defun personal/-lookup-key (map key)
-;;  (catch 'found
-;;    (map-keymap (lambda (k b) (if (equal key k) (throw 'found b))) map)))
-;;
-;;(defun personal/catch-tty-ESC ()
-;;  "Setup key mappings of current terminal to turn a tty's ESC into `escape'."
-;;  (when (memq (terminal-live-p (frame-terminal)) '(t pc))
-;;    (let ((esc-binding (personal/-lookup-key input-decode-map ?\e)))
-;;      (define-key input-decode-map
-;;        [?\e] `(menu-item "" ,esc-binding :filter personal/-tty-ESC-filter)))))
-;;
-;;(personal/catch-tty-ESC)
-;;; =======================================================                            
-;;
-;;
-;;(require 'god-mode)
-;; (global-set-key (kbd "<escape>") 'god-local-mode)
-;;
-;;; Change cursor if in god mode                                                       
-;;(defun my-update-cursor ()
-;;  (setq cursor-type (if (or god-local-mode buffer-read-only) 'bar 'box)))
-;;
-;;(eval-after-load 'god-local-mode
-;;  '(progn
-;;     (add-hook 'god-mode-enabled-hook 'my-update-cursor)
-;;     (add-hook 'god-mode-disabled-hook 'my-update-cursor)))
-#+END_SRC
-** paradox-init.el
-#+BEGIN_SRC emacs-lisp
-;; (setq paradox-github-token "238f6f79c981fbd612537b56a83cba310c069563")
-#+END_SRC
-** ace-window-init.el
-#+BEGIN_SRC emacs-lisp
-;;;;; ============== ACE WINDOW MACRO =========================                          
-;;(global-set-key (kbd "M-p") 'ace-window)
-;;;;; =========================================================   
-#+END_SRC
-** outline-mode-init.el
-#+BEGIN_SRC emacs-lisp
-;;;;; OUTLINE MODE                                                                       
-;;;;; allows hiding of some parts of text file                                           
-;;;;; i.e. folding sections, subsections, chapters                                       
-;;;;; Hide current section: C-c C-o C-l                                                  
-;;;;; Move to next unit of doc: C-c C-o C-n                                              
-;;;;; Move to prev unit of doc: C-c C-o C-p                                              
-;;;;; See whole doc again: C-c C-o C-a                                                   
-;;(defun turn-on-outline-minor-mode ()
-;;(outline-minor-mode 1))
-;;
-;;(add-hook 'LaTeX-mode-hook 'turn-on-outline-minor-mode)
-;;(add-hook 'latex-mode-hook 'turn-on-outline-minor-mode)
-;;(setq outline-minor-mode-prefix "\C-c \C-o") ; Or something else                       
-;;;;; END OUTLINE MODE            
-#+END_SRC

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: section_star
+# key: sec*
+# --
+\section*{$1}
+\label{sec:${2:label}}
+$0
