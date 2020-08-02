@@ -1,0 +1,66 @@
+# -*- mode: snippet -*-
+# name: minsparsetable
+# key: minsparsetable
+# --
+template<typename T, typename Comp=std::less<T>>
+struct MinSparseTable
+{
+    size_t N, K;
+    std::vector<std::vector<T> > dp;
+    std::vector<std::vector<T> > idx;
+    std::vector<size_t> logtable;
+    
+    Comp comp;
+
+    MinSparseTable() = default;
+    MinSparseTable(const std::vector<T>& arr): N {arr.size()}, K {(size_t)log2(arr.size())}
+    {
+	logtable.resize(N+1, 0);
+	for(int i = 2; i <= N; ++i) logtable[i] = logtable[i/2] + 1;
+
+	dp.resize(K+1);
+	idx.resize(K+1);
+	dp[0].resize(N);
+	idx[0].resize(N);
+	for(int i = 0; i < N; ++i)
+	{
+	    dp[0][i] = arr[i];
+	    idx[0][i] = i;
+	}
+
+	for(int p = 1; p <= K; ++p)
+	{
+	    int row_size = N - (1<<p) + 1;
+	    dp[p].resize(row_size);
+	    idx[p].resize(row_size);
+	    for(int i = 0; i + (1 << p) <= N; ++i)
+	    {
+		T& left = dp[p-1][i];
+		T& right = dp[p-1][i + (1<<(p-1))]; 
+		
+		dp[p][i] = std::min(left, right, comp);
+
+		if(comp(left, right))
+		    idx[p][i] = idx[p-1][i];
+		else
+		    idx[p][i] = idx[p-1][i + (1<<(p-1))];
+	    }	    
+	}
+    }
+    
+    T query(int L, int R) // O(1)
+    {
+	size_t p = logtable[R-L+1];
+	return std::min(dp[p][L], dp[p][R - (1<<p) + 1], comp);
+    }
+
+    T min_index_query(int L, int R)
+    {
+	size_t p = logtable[R-L+1];
+	T& left = dp[p][L];
+	T& right = dp[p][R - (1<<p) + 1];
+	if(comp(left, right)) return idx[p][L];
+	return idx[p][R - (1<<p) + 1];
+    }
+
+};

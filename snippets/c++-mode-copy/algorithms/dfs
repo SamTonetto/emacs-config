@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: dfs
+# key: dfs
+# --
+std::stack<${1:_type_}> s;
+for(!s.empty())
+{
+    $1 current = s.top();
+    s.pop();
+
+    $0;
+}

@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: pairhash
+# key: pairhash
+# --
+namespace std
+{
+    template<typename U, typename V>
+    struct hash<std::pair<U,V> >
+    {
+        std::size_t operator()(const std::pair<U,V>& p) const noexcept
+        {
+            auto hash1 = std::hash<U>() (p.first);
+            auto hash2 = std::hash<V>() (p.second);
+            return hash1 ^ hash2;
+        }
+    };
+}

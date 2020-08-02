@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: printvector
+# key: pv
+# --
+for(const auto & x : ${1:vec})
+    std::cout << x << ' ';
+std::cout << '\n';
+$0

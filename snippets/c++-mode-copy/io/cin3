@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: cin3
+# key: cin3
+# --
+${1:_type_} $2, $3, $4;
+std::cin >> $2 >> $3 >> $4;
+$0

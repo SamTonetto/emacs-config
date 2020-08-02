@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: binomial coefficient
+# key: ncr
+# --
+long long ncr(int n, int k) {
+    long double res = 1;
+    for (int i = 1; i <= k; ++i)
+        res = res * (n - k + i) / i;
+    return (long long)(res + 0.01);
+}

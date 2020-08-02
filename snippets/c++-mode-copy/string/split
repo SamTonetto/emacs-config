@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: string split
+# key: split
+# --
+template<typename InputIterator>
+vector<string> split(InputIterator first, InputIterator last, char delim=' ')
+{
+    stringstream ss(string(first, last));
+    string item;
+    vector<string> elems;
+    while (getline(ss, item, delim))  elems.push_back(item);
+    return elems;
+}

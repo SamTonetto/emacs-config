@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: extended euclidean algorithm
+# key: extended_gcd
+# --
+std::tuple<long long, long long, long long> extended_gcd(long long a, long long b)
+{
+    if (a == 0)	return std::make_tuple(b, 0, 1);
+    long long gcd_ab, x, y; 
+    std::tie(gcd_ab, x, y) = extended_gcd(b % a, a);
+    return std::make_tuple(gcd_ab, (y - (b/a)*x), x);
+}

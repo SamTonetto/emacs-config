@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: modular factorials
+# key: modfactorials
+# --
+std::vector<long long> mod_factorials(${1:_MAXN_}+1);
+mod_factorials[0] = 1;
+for(int i = 1; i <= $1; ++i) mod_factorials[i] = (mod_factorials[i-1]  * i) % ${2:1000000007};
+$0

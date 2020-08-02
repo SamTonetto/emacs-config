@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: minmax_element
+# key: minmax
+# --
+auto minmax = std::minmax_element(${1:container}.begin(), $1.end());
+$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vout
+# key: vout
+# --
+std::cout << "${1:var} = " << $1 << std::endl;$0 

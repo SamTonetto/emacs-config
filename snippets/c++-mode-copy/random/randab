@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: rand integer in [a,b] inclusive
+# key: randab
+# --
+rand() % (${2:_high_} - ${1:_low_} + 1) + $1;

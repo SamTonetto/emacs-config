@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: cinvec
+# key: cinvec
+# --
+std::vector<${1:_type_}> ${2:_name_}(${3:_size_});
+for(int i = 0; i < $3; ++i) std::cin >> $2[i];

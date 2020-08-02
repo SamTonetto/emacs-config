@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: vectorhash
+# key: vectorhash
+# --
+namespace std
+{
+    template<typename T>
+    struct hash<std::vector<T> >
+    {
+        std::size_t operator()(const std::vector<T>& v) const noexcept
+        {
+              std::size_t seed = v.size();
+              for(auto& i : v) {
+                seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+              }
+              return seed;
+        }
+    };
+}

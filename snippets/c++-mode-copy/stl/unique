@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: unique
+# key: unique
+# --
+auto pos = std::unique(${1:container}.begin(), $1.end());
+$0

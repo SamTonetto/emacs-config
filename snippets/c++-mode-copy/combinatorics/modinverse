@@ -1,0 +1,22 @@
+# -*- mode: snippet -*-
+# name: modular inverse
+# key: modinverse
+# --
+long long mod_inverse(long long N, long long M=1000000007)
+{
+    // Extended Euclidean algorithm
+    long long a = M, b = N;
+    long long prevx = 1, x = 0;
+    long long prevy = 0, y = 1;
+    long long temp, q;
+    while(b)
+    {
+	q = a/b;
+	temp = x; x = prevx - q*x; prevx = temp;
+	temp = y; y = prevy - q*y; prevy = temp;
+	temp = b; b = a % b; a = temp; 
+    }
+    if(a != 1) return LLONG_MIN; // failed
+    if(prevy < 0) return prevy + M;
+    return prevy;
+}

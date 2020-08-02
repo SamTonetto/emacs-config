@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: newline 
+# key: \n
+# --
+std::cout << std::endl;$0

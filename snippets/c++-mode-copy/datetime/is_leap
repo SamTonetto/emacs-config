@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: is leap year,  http://howardhinnant.github.io/date_algorithms.html
+# key: isleap
+# --
+template <class Int>
+constexpr bool is_leap(Int y) noexcept { return  y % 4 == 0 && (y % 100 != 0 || y % 400 == 0); }
+$0

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: stable_sort
+# key: stablesort
+# --
+std::stable_sort(${1:container}.begin(), $1.end());
+$0

@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: pretty printing functions
+# key: pprint
+# --
+#define tt template<typename T> ostream& operator <<(ostream& os, const
+#define tuv template<typename U, typename V> ostream& operator<<(ostream& os, const
+tt vector<T>& v)            { os << "["; for(auto & x : v) os << " " << x; os << " ]"; return os; }
+tt vector<vector<T> >& m)   { for(auto & x : m) { for(auto & y : x) os << y << " "; os << "\n"; } return os; }
+tt set<T>& s)               { os << "{"; for(auto & x : s) os << " " << x; os << " }"; return os; }
+tt unordered_set<T>& s)     { os << "{"; for(auto & x : s) os << " " << x; os << " }"; return os; }
+tt queue<T>& q)             { queue<T> q2(q); while(!q2.empty()) { os << q2.front() << " "; q2.pop(); } return os; }
+tt stack<T>& s)             { stack<T> s2(s); while(!s2.empty()) { os << s2.top() << " "; s2.pop(); } return os; }
+tuv pair<U,V>& p)           { os << "(" << p.first << "," << p.second << ")"; return os; }
+tuv map<U,V>& m)            { os << "{ "; for(auto & x : m) os << x.first << ":" << x.second << " "; os << "}"; return os; }
+tuv unordered_map<U,V>& um) { os << "{ "; for(auto & x : um) os << x.first << ":" << x.second << " "; os << "}"; return os; }

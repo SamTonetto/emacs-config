@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: binet's fibonacci formula
+# key: fibonacci
+# --
+long long fibonacci(long long n)
+{
+    long double temp = pow((1 + sqrt(5)), n);
+    temp -= pow((1 - sqrt(5)), n);
+    temp /= (pow(2,n)*sqrt(5));
+    return (long long) (temp+0.01);
+}

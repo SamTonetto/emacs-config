@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: getline
+# key: getline
+# --
+std::string $1;
+std::getline(std::cin, $1);
+$0

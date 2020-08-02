@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: printmatrix
+# key: pm
+# --
+for(const auto & x : ${1:vec})
+{
+    for(const auto & y : x)
+        std::cout << y << ' ';
+    std::cout << '\n';
+}
+std::cout << '\n';
+$0

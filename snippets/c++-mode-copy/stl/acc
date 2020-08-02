@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: accumulate
+# key: acc
+# --
+std::accumulate(${1:container}.begin(), $1.end(), 0);
+$0

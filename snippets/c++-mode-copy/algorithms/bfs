@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: bfs
+# key: bfs
+# --
+std::queue<${1:_type_}> q;
+for(!q.empty())
+{
+    $1 current = q.front();
+    q.pop();
+
+    $0;
+}

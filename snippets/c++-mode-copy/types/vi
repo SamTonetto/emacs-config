@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vectorint
+# key: vi
+# --
+std::vector<int> $0

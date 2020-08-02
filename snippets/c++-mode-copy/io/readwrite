@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: readwrite
+# key: readwrite
+# --
+template<typename... T> void read(T&... args) { ((cin >> args), ...); }
+template<typename... T> void print(T&&... args) { ((cout << args), ...); std::cout << std::endl; }

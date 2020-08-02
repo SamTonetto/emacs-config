@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: all_of
+# key: allof
+# --
+if (std::all_of(${1:container}.begin(), $1.end(), []($2) {
+  $3
+})) {
+  $4
+}
+$0

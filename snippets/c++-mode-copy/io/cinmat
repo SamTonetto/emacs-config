@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: cinmat
+# key: cinmat
+# --
+std::vector<std::vector<${1:_type_}> > ${2:_name_}(${3:_height}, std::vector<$1>(${4:_width_}));
+for(int i = 0; i < $3; ++i)
+    for(int j = 0; j < $4; ++j)
+	std::cin >> $2[i][j];

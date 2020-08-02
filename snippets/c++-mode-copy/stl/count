@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: count
+# key: cnt
+# --
+auto n = std::count(${1:container}.begin(), $1.end(), $2);
+$0

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: equal
+# key: equal
+# --
+if (std::equal(${1:container}.begin(), $1.end(), $2.begin())) {
+  $3
+}
+$0

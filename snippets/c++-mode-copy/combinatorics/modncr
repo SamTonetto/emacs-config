@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: modular binomial coefficient - requires mod_inverse function and precomputed mod_factorials
+# key: modncr
+# --
+auto modncr = [&mod_factorials](int n, int k, long long M=1000000007)
+{
+    return mod_factorials[n] * mod_inverse(mod_factorials[k], M) % M * mod_inverse(mod_factorials[n-k], M) % M;
+};

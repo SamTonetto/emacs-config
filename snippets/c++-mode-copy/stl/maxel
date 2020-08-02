@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: max_element
+# key: maxel
+# --
+auto pos = std::max_element(${1:container}.begin(), $1.end());
+$0

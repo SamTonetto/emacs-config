@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: random sample from [1, n]
+# key: randsample
+# --
+std::vector<int> ${1:_sample_}(${2:_range_});
+std::iota($1.begin(), $1.end(), 0);
+std::random_shuffle($1.begin(), $1.end());
+$1 = std::vector<int>($1.begin(), $1.begin() + ${3:_#samples_});
+$0

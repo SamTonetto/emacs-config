@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: string join between iterators
+# key: join
+# --
+template<typename Iter>
+string join(Iter first, Iter last, char delim=' ')
+{
+    string s;
+    for(auto it = first; it != last; ++it)
+    {
+	s += (*it);
+	s += delim;	
+    }
+    s.pop_back();
+    return s;
+}

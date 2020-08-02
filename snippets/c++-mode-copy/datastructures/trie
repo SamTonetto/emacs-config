@@ -1,0 +1,50 @@
+# -*- mode: snippet -*-
+# name: trie
+# key: trie
+# --
+
+struct Trie {
+    struct Node {
+	string val;
+        std::unordered_map<char, Node*> children;
+        bool is_word = false;
+        Node() = default;
+        Node(string val): val{val} {}
+    };
+    Node* root;
+
+    Trie() = default; 
+    Trie() { root = new Node() };
+
+    void insert(string word) {    
+        Node* head = root;
+        for(int i = 0; i < word.size(); ++i) {
+            if(head->children.find(word[i]) == head->children.end()) {
+                Node* next = new Node(word.substr(0, i+1));
+                head->children.insert(make_pair(word[i], next));    
+                head = next;
+            }
+            else {
+                head = head->children[word[i]];
+            }
+        }
+        head->is_word = true;
+    }
+    
+    bool search(string word) {
+        Node* head = root;
+        for(int i = 0; i < word.size(); ++i) {
+            if(head->children.find(word[i]) == head->children.end()) return false;
+            head = head->children[word[i]];
+        }
+    }
+    
+    bool startsWith(string prefix) {
+        Node* head = root;
+        for(int i = 0; i < prefix.size(); ++i) {
+            if(head->children.find(prefix[i]) == head->children.end()) return false;
+            head = head->children[prefix[i]];
+        }
+        return true;
+    }
+};

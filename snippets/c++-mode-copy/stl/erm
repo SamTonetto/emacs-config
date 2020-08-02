@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: erase-remove
+# key: erm
+# --
+${1:container}.erase(std::remove($1.begin(), $1.end(), $2), $1.end());
+$0

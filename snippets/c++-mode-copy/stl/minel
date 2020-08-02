@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: min_element
+# key: minel
+# --
+auto pos = std::min_element(${1:container}.begin(), $1.end());
+$0

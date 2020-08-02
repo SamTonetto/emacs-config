@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: weekday from days,  http://howardhinnant.github.io/date_algorithms.html
+# key: weekdayfromdays
+# --
+template <class Int>
+constexpr unsigned weekday_from_days(Int z) noexcept { return static_cast<unsigned>(z >= -4 ? (z+4) % 7 : (z+5) % 7 + 6); }
+$0

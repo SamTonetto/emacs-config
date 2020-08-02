@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: atcoder template
+# key: act
+# --
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define MOD 1000000007
+#define vi vector<int>
+#define vvi vector<vector<int> >
+#define vii vector<pair<int, int> >
+
+
+int main()
+{
+    std::ios_base::sync_with_stdio(false);    
+    std::cin.tie(NULL);
+
+    $0
+
+    return 0;
+}

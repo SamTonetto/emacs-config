@@ -1,0 +1,62 @@
+# -*- mode: snippet -*-
+# name: sparsetable
+# key: sparsetable
+# --
+template<typename T, typename Fn>
+struct SparseTable
+{
+    size_t N, K;
+    std::vector<std::vector<T> > dp;
+    std::vector<size_t> logtable;
+    
+    Fn f;
+
+    SparseTable() = default;
+    SparseTable(const std::vector<T>& arr): N {arr.size()}, K {(size_t)log2(arr.size())}
+    {
+	logtable.resize(N+1, 0);
+	for(int i = 2; i <= N; ++i) logtable[i] = logtable[i/2] + 1;
+
+	dp.resize(K+1);
+	dp[0].resize(N);
+	for(int i = 0; i < N; ++i) dp[0][i] = arr[i];
+	for(int p = 1; p <= K; ++p)
+	{
+	    int row_size = N - (1<<p) + 1;
+	    dp[p].resize(row_size);
+	    for(int i = 0; i + (1 << p) <= N; ++i)
+		dp[p][i] = f(dp[p-1][i], dp[p-1][i+(1<<(p-1))]); 	    
+	}
+    }
+    
+    T query(int L, int R) // O(1)
+    {
+	/*
+	  Use only with overlap-friendly functions, e.g. min or max.
+	  Do NOT use with a+b,a*b,gcd(a,b) etc.
+	*/
+	size_t p = logtable[R-L+1];
+	return f(dp[p][L], dp[p][R - (1<<p) + 1]);
+    }
+
+    T cascading_query(int L, int R, T res) // O(K) = O(logN)
+    {
+	/* 
+	   "res" is default value for comparison,
+	   f = min(a,b) => res = +inf, 
+	   f = max(a,b) => res = -inf,
+	   f = a+b      => res = 0,
+	   f = a*b      => res = 1,
+	   f = gcd(a,b) => res = 0
+	*/
+	for(int p = K; p >= 0; p--)
+	{
+	    if((1 << p) <= R - L + 1)
+	    {
+		res = f(res, dp[p][L]);
+		L += (1<<p);		
+	    }
+	}
+	return res;
+    }
+};

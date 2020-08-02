@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: tests
+# key: tests
+# --
+int t;
+std::cin >> t;
+
+while(t--)
+{
+    $0
+}

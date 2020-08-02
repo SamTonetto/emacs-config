@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: count_if
+# key: countif
+# --
+auto n = std::count_if(${1:container}.begin(), $1.end(), []($2) {
+    $3
+});
+$0

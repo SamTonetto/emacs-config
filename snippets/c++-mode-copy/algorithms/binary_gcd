@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: binary gcd - compute gcd with bit operations, a.k.a Stein's algorithm.
+# key: binary_gcd
+# --
+int binarygcd(long long a, long long b)
+{
+    while(b) b ^= a ^= b ^= a %= b;
+    return a;
+}
