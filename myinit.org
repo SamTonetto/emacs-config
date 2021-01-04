@@ -284,34 +284,58 @@ Use Shift + Arrowkeys to quickly switch windows.
 #+END_SRC
 
 
-* Org Mode
-** org-mode setup
-Org-mode is an Emacs major mode that does a lot of different things.
+** rainbow-mode           (automatically color hex codes)
 #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :init
-    (add-hook 'org-mode-hook (lambda () (org-indent-mode t)) t)  ; indents nested bullet points
+(use-package rainbow-mode
+ :ensure t)
 
-    (add-hook 'org-shiftup-hook 'windmove-up)              ; Shift + Up to move up a window
-    (add-hook 'org-shiftleft-hook 'windmove-left)          ; Shift + Left to move to left window
-    (add-hook 'org-shiftdown-hook 'windmove-down)          ; Shift + Down to move down a window
-    (add-hook 'org-shiftright-hook 'windmove-right)        ; Shift + Right to move to right window
+(add-hook 'web-mode-hook #'rainbow-mode)
+(add-hook 'org-mode-hook #'rainbow-mode)
 
-    ;; (add-hook 'org-shiftup-final-hook 'windmove-up)              ; Shift + Up to move up a window
-    ;; (add-hook 'org-shiftleft-final-hook 'windmove-left)          ; Shift + Left to move to left window
-    ;; (add-hook 'org-shiftdown-final-hook 'windmove-down)          ; Shift + Down to move down a window
-    ;; (add-hook 'org-shiftright-final-hook 'windmove-right)        ; Shift + Right to move to right window
-
-    )
 #+END_SRC
+
+
+* Org Mode
+
+** org-mode setup
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :init
+  (add-hook 'org-mode-hook (lambda () (org-indent-mode t)) t)  ; indents nested bullet points
+  (add-hook 'org-shiftup-hook 'windmove-up)              ; Shift + Up to move up a window
+  (add-hook 'org-shiftleft-hook 'windmove-left)          ; Shift + Left to move to left window
+  (add-hook 'org-shiftdown-hook 'windmove-down)          ; Shift + Down to move down a window
+  (add-hook 'org-shiftright-hook 'windmove-right)        ; Shift + Right to move to right window
+)
+#+END_SRC
+
+
+** org customize code block headers
+
+#+BEGIN_SRC emacs-lisp
+;;(setq org-fontify-whole-heading-line t)
+
+(set-face-attribute 'org-meta-line nil 
+		    :height 1.0
+		    :slant 'oblique
+		    :underline "#faebd7"
+		    :foreground "#ffaaff"
+		    :background "#000000"
+		    :extend t)
+
+(setq org-src-fontify-natively t)
+#+END_SRC
+
+
 ** org-bullets (aesthetic bullet points)
 Shows org-mode bullets as UTF-8 characters instead of asterisks.
 Only works in GUI emacs - may not work in terminal.
+
 #+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;;(use-package org-bullets
+;;  :ensure t
+;;  :config
+;;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
 
@@ -321,6 +345,7 @@ Only works in GUI emacs - may not work in terminal.
       org-src-tab-acts-natively t
       org-src-preserve-indentation t)
 #+END_SRC
+
 
 ** load languages for use in org-mode code  blocks
 
@@ -376,6 +401,12 @@ To toggle displaying inline, use keybinding "C-c C-x C-v"
 #+END_SRC
 
 
+** Make source code blocks tabs natively
+#+BEGIN_SRC emacs-lisp
+(setq org-src-tab-acts-natively t)
+#+END_SRC
+
+
 * Latex
 ** AucTex path
 #+BEGIN_SRC emacs-lisp
@@ -386,87 +417,11 @@ To toggle displaying inline, use keybinding "C-c C-x C-v"
 
 * Code Editing
 
-** Code completion
-
-*** lsp-mode
- https://github.com/MatthewZMD/.emacs.d/tree/master/elisp
-#+BEGIN_SRC emacs-lisp
-(use-package lsp-mode
-  :defer t
-  :commands lsp
-  :custom
-  (lsp-auto-guess-root nil)               ;; Automatically guess project root using projectile.
-  (lsp-prefer-flymake nil)                ;; Use (the more modern) flycheck instead of flymake for syntax checking.
-  (lsp-file-watch-threshold 2000)         
-  (read-process-output-max (* 1024 1024)) ;; Control how much data emacs can read in one pass from server. For efficiency.
-  (lsp-eldoc-hook nil)                    
-
-  :bind
-  (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook
-  ((java-mode python-mode go-mode
-              js-mode js2-mode typescript-mode web-mode
-              c-mode c++-mode objc-mode) . lsp)
-  )
-#+END_SRC
-
-*** lsp-clangd
-#+BEGIN_SRC emacs-lisp
-(setq lsp-clangd-executable "/usr/local/opt/llvm/bin/clangd")
-(setq lsp-clients-clangd-executable "/usr/local/opt/llvm/bin/clangd")
-#+END_SRC
-
-*** lsp-ui
-#+BEGIN_SRC emacs-lisp
-(use-package lsp-ui
-  :after lsp-mode
-  :diminish
-  :commands lsp-ui-mode
-  :custom-face
-  (lsp-ui-doc-background ((t (:background nil))))
-  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
-  :bind
-  (:map lsp-ui-mode-map
-        ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-        ([remap xref-find-references] . lsp-ui-peek-find-references)
-        ("C-c u" . lsp-ui-imenu)
-        ("M-i" . lsp-ui-doc-focus-frame))
-  (:map lsp-mode-map
-        ("M-n" . forward-paragraph)
-        ("M-p" . backward-paragraph))
-  :custom
-  (lsp-ui-doc-header t)                           ;; Whether or not to enable the header which displays the symbol string.
-  (lsp-ui-doc-include-signature t)                ;; Whether or not to include the object signature/type in the frame.
-  (lsp-ui-doc-border (face-foreground 'default))  ;; Border color of the frame
-  (lsp-ui-sideline-enable nil)                    ;; Whether or not to enable lsp-ui-sideline
-  (lsp-ui-sideline-ignore-duplicate t)            ;; Ignore duplicates when there is a same symbol with same contents
-  (lsp-ui-sideline-show-code-actions nil)         ;; Whether to show code actions in sideline.
- )
-#+END_SRC
-
-*** company (autocompletion framework with pluggable backends)
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    :ensure t
-    :config
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 3)
-
-    (global-company-mode t))
-#+END_SRC
-
-
-
-*** disable lsp-enable-on-type-formatting
-#+BEGIN_SRC emacs-lisp
-(setq lsp-enable-on-type-formatting nil)
-#+END_SRC
-
-
-** Add to c++ mode
+** Add to C++ mode
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.tpp" . c++-mode))
 #+END_SRC
+
 
 ** yasnippet
 
@@ -483,7 +438,7 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 
 (setq yas-triggers-in-field t)
 
-;; Note: 
+;; Note:
 ;; yas-keymap is the active keymap while a snippet expansion is in progress
 ;; in contrast to yas-minor-mode-map, which is the keymap outside of snippet expansion.
 
@@ -496,9 +451,8 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 #+END_SRC
 
 
+** vimish fold
 
-
-** vimish-fold
 #+BEGIN_SRC emacs-lisp
 (use-package vimish-fold
   :ensure t
@@ -518,6 +472,10 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 (setq c-default-style "bsd"
         c-basic-offset 4)
 #+END_SRC
+
+
+
+
 
 
 
@@ -550,6 +508,18 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 
 (add-hook 'web-mode-hook 'my-web-mode-auto-indent-hook)
 #+END_SRC
+
+
+** tide-mode (for typescript)
+#+BEGIN_SRC emacs-lisp
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
+#+END_SRC
+
 
 * Project/Document Navigation
 ** ibuffer (better buffer list)
@@ -661,6 +631,12 @@ In all cases the '-e' flag is required so that ctags will generate an emacs tags
     :diminish
     :after (:all lsp-mode ivy))
 
+#+END_SRC
+
+
+** neotree autorefresh
+#+BEGIN_SRC emacs-lisp
+(setq neo-autorefresh t)
 #+END_SRC
 
 
