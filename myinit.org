@@ -424,17 +424,52 @@ To toggle displaying inline, use keybinding "C-c C-x C-v"
 
 * Code Editing
 
+** toggle fold triple slash comments
+
+#+BEGIN_SRC emacs-lisp
+(defvar triple-slash-comments-folded 0)
+
+(defun toggle-fold-triple-slash-comments()
+  (interactive)
+  (cond
+   ((= triple-slash-comments-folded 0)
+    (hide-lines-matching "///*")
+    (setq triple-slash-comments-folded 1)
+    )
+   ((= triple-slash-comments-folded 1)
+    (hide-lines-show-all)
+    (setq triple-slash-comments-folded 0)
+    )
+))
+
+(define-key c-mode-base-map (kbd "C-'") 'toggle-fold-triple-slash-comments)
+#+END_SRC
+
+
 ** clang-format
 #+BEGIN_SRC emacs-lisp
 ;; Clang stuff
 (require 'clang-format)
 (setq clang-format-style "file")
 
-(add-hook 'c-mode-common-hook
-          (function (lambda ()
-                    (add-hook 'before-save-hook
-                              'clang-format-buffer))))
+(defun clang-format-save-hook-for-this-buffer ()
+  "Create a buffer local save hook."
+  (add-hook 'before-save-hook
+    (lambda ()
+      (progn
+        (when (locate-dominating-file "." ".clang-format")
+          (clang-format-buffer))
+        ;; Continue to save.
+        nil))
+    nil
+    ;; Buffer local hook.
+    t))
+
+;; Run this for each mode you want to use the hook.
+(add-hook 'c-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
+(add-hook 'c++-mode-hook (lambda () (clang-format-save-hook-for-this-buffer)))
 #+END_SRC
+
 
 ** Add to C++ mode
 #+BEGIN_SRC emacs-lisp
