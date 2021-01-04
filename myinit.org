@@ -339,6 +339,13 @@ Only works in GUI emacs - may not work in terminal.
 #+END_SRC
 
 
+** protect org-mode from itself
+#+BEGIN_SRC emacs-lisp
+(setq org-catch-invisible-edits 'smart)
+(setq org-ctrl-k-protect-subtree t)
+#+END_SRC
+
+
 ** preserve indents after exiting org edit mode
 #+BEGIN_SRC emacs-lisp
 (setq org-edit-src-content-indentation 0
@@ -416,6 +423,18 @@ To toggle displaying inline, use keybinding "C-c C-x C-v"
 
 
 * Code Editing
+
+** clang-format
+#+BEGIN_SRC emacs-lisp
+;; Clang stuff
+(require 'clang-format)
+(setq clang-format-style "file")
+
+(add-hook 'c-mode-common-hook
+          (function (lambda ()
+                    (add-hook 'before-save-hook
+                              'clang-format-buffer))))
+#+END_SRC
 
 ** Add to C++ mode
 #+BEGIN_SRC emacs-lisp
