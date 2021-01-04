@@ -263,6 +263,12 @@ Use Shift + Arrowkeys to quickly switch windows.
     :ensure t
     :config
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+
+(set-face-attribute 'rainbow-delimiters-unmatched-face nil
+                    :foreground 'unspecified
+                    :inherit 'error
+                    :strike-through t)
 #+END_SRC
 
 ** global-hl-line-mode    (highlight current line)
@@ -279,7 +285,8 @@ Use Shift + Arrowkeys to quickly switch windows.
 ** Indentation guides     (mostly useful for python)
 #+BEGIN_SRC emacs-lisp
 (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'column)
+(add-hook 'c++-mode-hook 'highlight-indent-guides-mode)
+(setq highlight-indent-guides-method 'character)
 (setq highlight-indent-guides-responsive 'top)
 #+END_SRC
 
@@ -533,6 +540,11 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 
 
 
+
+** electric pair mode
+#+BEGIN_SRC emacs-lisp
+(electric-pair-mode 1)
+#+END_SRC
 
 * Web modes
 
