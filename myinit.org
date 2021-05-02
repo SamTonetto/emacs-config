@@ -557,7 +557,6 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 
 ** helm-swoop and helm-ag text replacemenent workflow
 
-
 *** Find-replace text in all subdirectories with helm-ag
 1. Type "M-x helm-ag" (requires helm-ag)
 2. Type the text pattern to search for
@@ -574,11 +573,14 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 3. This will list all occurrences in current buffer
    If you want occurrences in every open buffer, press
    "M-i" again.
+   - Now, you can navigate through all occurrences with 
+     "C-r" and "C-s" if you wish.
 4. Type "C-c C-e" to enter edit mode.
 5. Select region to edit and then use iedit to 
    simultaneously edit text (hotkey should be C-;)
 6. Type "C-x C-s" to save changes.
 
+*** helm-swoop code
 
 #+BEGIN_SRC emacs-lisp
 ;; helm from https://github.com/emacs-helm/helm
