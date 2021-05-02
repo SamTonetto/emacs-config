@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vectorvectorvector
+# key: vvv
+# --
+std::vector<std::vector<std::vector<$1> > >

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: rangefor
+# key: f
+# --
+for(const auto& $1 : $2)
+{
+    $0
+}

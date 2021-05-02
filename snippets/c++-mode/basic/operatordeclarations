@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: basic operator declarations
+# key: opd
+# --
+$1bool operator==(const ${2:_type_}& x, const $2& y);
+$1bool operator!=(const $2& x, const $2& y);
+$1bool operator<(const $2& x, const $2& y);
+$1bool operator>(const $2& x, const $2& y);
+$1bool operator<=(const $2& x, const $2& y);
+$1bool operator>=(const $2& x, const $2& y);
+$0

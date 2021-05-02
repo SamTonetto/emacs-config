@@ -2,4 +2,4 @@
 # name: vectorint
 # key: vi
 # --
-std::vector<int> $0
+std::vector<int>

@@ -1,0 +1,28 @@
+# -*- mode: snippet -*-
+# name: basic operator implementations
+# key: opi
+# --
+$1bool operator==(const ${2:_type_}& x, const $2& y)
+{
+    $0;
+}
+$1bool operator<(const $2& x, const $2& y)
+{
+
+}
+$1bool operator!=(const $2& x, const $2& y)
+{
+    return !(x == y);
+}
+$1bool operator>(const $2& x, const $2& y)
+{
+    return y < x;
+}
+$1bool operator<=(const $2& x, const $2& y)
+{
+    return !(y < x);
+}
+$1bool operator>=(const $2& x, const $2& y)
+{
+    return !(x < y);
+}

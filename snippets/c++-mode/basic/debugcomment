@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: debugcomment
+# key: db
+# --
+#ifndef NDEBUG
+    std::cout << "$1" << std::endl;
+#endif

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: pairints
+# key: pii
+# --
+std::pair<int, int>$0

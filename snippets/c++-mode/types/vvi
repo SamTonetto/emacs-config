@@ -2,4 +2,4 @@
 # name: vectorvectorint
 # key: vvi
 # --
-std::vector<std::vector<int> > $0
+std::vector<std::vector<int> >

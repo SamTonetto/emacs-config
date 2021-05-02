@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vectorpairints
+# key: vpii
+# --
+std::vector<std::pair<int, int> >$0

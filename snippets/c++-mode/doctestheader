@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: doctestheader
+# key: dh
+# --
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
+$0

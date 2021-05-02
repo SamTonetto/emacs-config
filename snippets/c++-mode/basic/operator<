@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: operator<
+# key: op<
+# --
+$1bool operator<(const ${2:_type_}& x, const $2& y)$0

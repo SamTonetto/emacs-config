@@ -283,9 +283,11 @@ Use Shift + Arrowkeys to quickly switch windows.
 
 
 ** Indentation guides     (mostly useful for python)
+
+(currently turned off for c++-mode due to being slow)
 #+BEGIN_SRC emacs-lisp
 (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
-(add-hook 'c++-mode-hook 'highlight-indent-guides-mode)
+;;(add-hook 'c++-mode-hook 'highlight-indent-guides-mode)
 (setq highlight-indent-guides-method 'character)
 (setq highlight-indent-guides-responsive 'top)
 #+END_SRC
@@ -545,6 +547,92 @@ Configured so that <backtab> (i.e. Shift+Tab) expands snippets recursively, and
 #+BEGIN_SRC emacs-lisp
 (electric-pair-mode 1)
 #+END_SRC
+
+
+** hide-ifdef-mode shadow text instead of hiding
+#+BEGIN_SRC emacs-lisp
+(setq hide-ifdef-shadow t)
+#+END_SRC
+
+
+** helm-swoop and helm-ag text replacemenent workflow
+
+
+*** Find-replace text in all subdirectories with helm-ag
+1. Type "M-x helm-ag" (requires helm-ag)
+2. Type the text pattern to search for
+3. Type "C-c C-e" to enter edit mode
+4. Select region to edit and then use  
+   iedit to simultaneously edit text 
+   (hotkey should be C-;)
+5. Type "C-c C-c" to commit changes to files 
+   (i.e. save changes)
+
+*** Find-replace text in open buffers with helm-swoop
+1. Select text in current buffer
+2. Use shortcut "M-i" or type "M-x helm-swoop"
+3. This will list all occurrences in current buffer
+   If you want occurrences in every open buffer, press
+   "M-i" again.
+4. Type "C-c C-e" to enter edit mode.
+5. Select region to edit and then use iedit to 
+   simultaneously edit text (hotkey should be C-;)
+6. Type "C-x C-s" to save changes.
+
+
+#+BEGIN_SRC emacs-lisp
+;; helm from https://github.com/emacs-helm/helm
+(require 'helm)
+
+;; Locate the helm-swoop folder to your path
+(add-to-list 'load-path "~/.emacs.d/elisp/helm-swoop")
+(require 'helm-swoop)
+
+;; Change the keybinds to whatever you like :)
+(global-set-key (kbd "M-i") 'helm-swoop)
+(global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
+(global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
+(global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
+
+;; When doing isearch, hand the word over to helm-swoop
+(define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+;; From helm-swoop to helm-multi-swoop-all
+(define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
+;; When doing evil-search, hand the word over to helm-swoop
+;; (define-key evil-motion-state-map (kbd "M-i") 'helm-swoop-from-evil-search)
+
+;; Instead of helm-multi-swoop-all, you can also use helm-multi-swoop-current-mode
+(define-key helm-swoop-map (kbd "M-m") 'helm-multi-swoop-current-mode-from-helm-swoop)
+
+;; Move up and down like isearch
+(define-key helm-swoop-map (kbd "C-r") 'helm-previous-line)
+(define-key helm-swoop-map (kbd "C-s") 'helm-next-line)
+(define-key helm-multi-swoop-map (kbd "C-r") 'helm-previous-line)
+(define-key helm-multi-swoop-map (kbd "C-s") 'helm-next-line)
+
+;; Save buffer when helm-multi-swoop-edit complete
+(setq helm-multi-swoop-edit-save t)
+
+;; If this value is t, split window inside the current window
+(setq helm-swoop-split-with-multiple-windows nil)
+
+;; Split direcion. 'split-window-vertically or 'split-window-horizontally
+(setq helm-swoop-split-direction 'split-window-vertically)
+
+;; If nil, you can slightly boost invoke speed in exchange for text color
+(setq helm-swoop-speed-or-color nil)
+
+;; ;; Go to the opposite side of line from the end or beginning of line
+(setq helm-swoop-move-to-line-cycle t)
+
+;; Optional face for line numbers
+;; Face name is `helm-swoop-line-number-face`
+(setq helm-swoop-use-line-number-face t)
+
+;; If you prefer fuzzy matching
+(setq helm-swoop-use-fuzzy-match t)
+#+END_SRC
+
 
 * Web modes
 
